@@ -3,19 +3,35 @@ services:
     image: postgres:17-alpine
     container_name: ledgerly-postgres
     environment:
-      POSTGRES_DB: ledgerly
-      POSTGRES_USER: ledgerly
-      POSTGRES_PASSWORD: ledgerly_dev_password
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ledgerly -d ledgerly" ]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  ledgerly:
+      image: ledgerly:1.0
+      container_name: ledgerly-app
+
+      ports:
+        - "8080:8080"
+
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+        SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+        SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+
+      depends_on:
+         postgres:
+           condition: service_healthy
 
 volumes:
   postgres_data:
