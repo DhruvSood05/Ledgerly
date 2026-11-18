@@ -438,41 +438,41 @@ These are non-negotiable design principles for the financial parts of
 Ledgerly.
 
   -----------------------------------------------------------------------
-  Concern                             Decision / principle
+Concern                             Decision / principle
   ----------------------------------- -----------------------------------
-  Money                               Use `BigDecimal`, explicit
-                                      currency, and defined
-                                      precision/scale. Never use
-                                      floating-point types.
+Money                               Use `BigDecimal`, explicit
+currency, and defined
+precision/scale. Never use
+floating-point types.
 
-  Ledger                              Use balanced, immutable
-                                      debit/credit entries.
+Ledger                              Use balanced, immutable
+debit/credit entries.
 
-  Atomicity                           A financial operation and its
-                                      related ledger records must commit
-                                      or roll back together.
+Atomicity                           A financial operation and its
+related ledger records must commit
+or roll back together.
 
-  Concurrency                         Select and test an explicit locking
-                                      strategy.
+Concurrency                         Select and test an explicit locking
+strategy.
 
-  Idempotency                         Support safe retries for operations
-                                      that must not execute twice.
+Idempotency                         Support safe retries for operations
+that must not execute twice.
 
-  Authorization                       Derive the acting user from the
-                                      authenticated security context.
+Authorization                       Derive the acting user from the
+authenticated security context.
 
-  Validation                          Validate request shape at the
-                                      boundary and enforce business rules
-                                      in the service/domain layer.
+Validation                          Validate request shape at the
+boundary and enforce business rules
+in the service/domain layer.
 
-  Database integrity                  Use constraints as a final
-                                      protection for critical invariants.
+Database integrity                  Use constraints as a final
+protection for critical invariants.
 
-  Auditability                        Preserve transaction references,
-                                      timestamps, and ledger history.
+Auditability                        Preserve transaction references,
+timestamps, and ledger history.
 
-  Testing                             Test invariants and failure
-                                      scenarios, not only happy paths.
+Testing                             Test invariants and failure
+scenarios, not only happy paths.
   -----------------------------------------------------------------------
 
 ## Suggested API shape
@@ -482,32 +482,32 @@ guide, not a promise that every route must be implemented exactly as
 written.
 
   ------------------------------------------------------------------------------
-  Method                  Example endpoint               Purpose
+Method                  Example endpoint               Purpose
   ----------------------- ------------------------------ -----------------------
-  POST                    `/api/v1/auth/register`        Register a user
+POST                    `/api/v1/auth/register`        Register a user
 
-  POST                    `/api/v1/auth/login`           Authenticate a user
+POST                    `/api/v1/auth/login`           Authenticate a user
 
-  GET                     `/api/v1/users/me`             Retrieve current user's
-                                                         profile
+GET                     `/api/v1/users/me`             Retrieve current user's
+profile
 
-  GET                     `/api/v1/wallets/me`           Retrieve current user's
-                                                         wallet
+GET                     `/api/v1/wallets/me`           Retrieve current user's
+wallet
 
-  GET                     `/api/v1/wallets/me/balance`   Retrieve wallet balance
+GET                     `/api/v1/wallets/me/balance`   Retrieve wallet balance
 
-  POST                    `/api/v1/deposits`             Simulate a deposit
+POST                    `/api/v1/deposits`             Simulate a deposit
 
-  POST                    `/api/v1/withdrawals`          Request a withdrawal
+POST                    `/api/v1/withdrawals`          Request a withdrawal
 
-  POST                    `/api/v1/transfers`            Transfer between
-                                                         wallets
+POST                    `/api/v1/transfers`            Transfer between
+wallets
 
-  GET                     `/api/v1/transactions`         List current user's
-                                                         transactions
+GET                     `/api/v1/transactions`         List current user's
+transactions
 
-  GET                     `/api/v1/transactions/{id}`    Retrieve an authorized
-                                                         transaction
+GET                     `/api/v1/transactions/{id}`    Retrieve an authorized
+transaction
   ------------------------------------------------------------------------------
 
 ## Learning checklist
@@ -586,17 +586,39 @@ implementation.
 - [x] Understand Docker images, containers, and Docker Compose fundamentals.
 - [x] Understand Docker restart policies, including `unless-stopped`.
 - [x] Understand Docker health checks and the `pg_isready` utility.
-- [ ] Start the PostgreSQL container using `docker compose up -d`.
-- [ ] Verify PostgreSQL container status and health.
-- [ ] Configure database connection settings outside source control where appropriate.
-- [ ] Connect Spring Boot to PostgreSQL.
-- [ ] Verify database connectivity.
-- [ ] Understand datasource configuration, connection pools, and JPA startup.
-- [ ] Add a basic integration test for application/database connectivity.
-- [ ] Add a Dockerfile for the application.
-- [ ] Add a simple application health endpoint or use the Actuator health endpoint.
-- [ ] Understand Actuator health indicators and what `UP` does—and does not—guarantee.
+- [x] Start the PostgreSQL container using `docker compose up -d`.
+- [x] Verify PostgreSQL container status and health.
+- [x] Configure database connection settings outside source control where appropriate.
+- [x] Connect Spring Boot to PostgreSQL.
+- [x] Verify database connectivity.
+- [x] Understand datasource configuration, connection pools, and JPA startup.
+- [x] Add a basic integration test for application/database connectivity.
+- [x] Add a Dockerfile for the application.
+- [x] Add a simple application health endpoint or use the Actuator health endpoint.
+- [x] Understand Actuator health indicators and what `UP` does—and does not—guarantee.
 - [ ] Deploy the minimal service and verify its health endpoint.
 
-**Next milestone:** Start PostgreSQL using Docker Compose, verify that the container becomes healthy, and configure Spring Boot to connect to the database.
+**Next milestone:** Complete user registration and authentication, beginning with the user repository and registration flow. Local Dockerization and container orchestration are complete; cloud deployment remains in Phase 8.
+
+
+### Phase 2 — User registration and authentication
+
+- [x] Define the user domain and user entity.
+- [x] Create the `UserRole` enum with `USER` and `ADMIN` roles.
+- [x] Map the `User` entity to the `users` table, including identity, email uniqueness, password hash, role, and timestamps.
+- [x] Add Flyway and the PostgreSQL Flyway database module.
+- [x] Create and successfully apply `V1__create_users_table.sql`.
+- [x] Configure Hibernate schema validation with Flyway-managed schema migrations.
+- [x] Create the `UserRepository` with `findByEmail` and `existsByEmail` query methods.
+- [ ] Create registration request and response DTOs.
+- [ ] Add Bean Validation constraints to request DTOs.
+- [ ] Implement registration service and controller.
+- [ ] Hash passwords using BCrypt; never store plaintext passwords.
+- [ ] Enforce unique email addresses at the database level as well as in application logic.
+- [ ] Configure Spring Security's filter chain and request authorization.
+- [ ] Implement login and JWT creation/verification.
+- [ ] Add an authenticated endpoint that returns the current user's profile.
+- [ ] Test registration, login, invalid credentials, duplicate email, and unauthorized access.
+
+**Current position:** User entity, Flyway migration, and `UserRepository` are in place. Next, implement the registration DTOs and end-to-end registration flow.
 
