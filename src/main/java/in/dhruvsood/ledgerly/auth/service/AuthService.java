@@ -2,6 +2,7 @@ package in.dhruvsood.ledgerly.auth.service;
 
 
 import in.dhruvsood.ledgerly.auth.dto.RegisterRequestDto;
+import in.dhruvsood.ledgerly.auth.exception.EmailAlreadyExistsException;
 import in.dhruvsood.ledgerly.user.dto.UserResponseDto;
 import in.dhruvsood.ledgerly.user.entity.User;
 import in.dhruvsood.ledgerly.user.entity.UserRole;
@@ -24,7 +25,7 @@ public class AuthService {
     @Transactional
     public UserResponseDto register(RegisterRequestDto request) {
         if(userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException(
+            throw new EmailAlreadyExistsException(
                     "Account with this email : " + request.getEmail() + " already exists"
             );
         }
